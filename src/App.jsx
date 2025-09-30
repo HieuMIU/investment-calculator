@@ -1,7 +1,7 @@
 import { useState } from "react";
 import Header from "./components/Header";
 import InvestmentResult from "./components/InvestmentResult";
-import { calculateInvestmentResults } from './util/investment.js';
+import UserInput from "./components/UserInput.jsx";
 function App() {
 
   const [userInput, setUserInput] = useState(
@@ -12,18 +12,26 @@ function App() {
         duration: 0
       });
   
-  const [investmentResult, setInvestmentResult] = useState([]);
+  let isInvalidInput = false;
 
-  function handleChangeUserInput(newInput) {
-    setUserInput(newInput);
-    const calResult = calculateInvestmentResults(newInput);
-    setInvestmentResult(calResult);
+  function handleChangeUserInput(inputIdentifier, newValue) {
+    setUserInput((prevUserInput) => {
+      return {
+        ...prevUserInput,
+        [inputIdentifier]: newValue
+      };
+    });
+    
+    if(userInput.duration < 0)
+      isInvalidInput = true;
   }
 
   return ( 
     <>
-      <Header userInput={userInput} onChange={handleChangeUserInput} />
-      <InvestmentResult results={investmentResult} />
+      <Header />
+      <UserInput userInput={userInput} onChange={handleChangeUserInput} />
+      {isInvalidInput && <p className="center">Please enter a duration greater than zero.</p>}
+      {!isInvalidInput && <InvestmentResult input={userInput} />}
     </>
   );
 }
